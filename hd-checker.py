@@ -3,7 +3,7 @@ import subprocess
 class HdChecker():
     def launch_hd_space(self):
         """
-        Method definition:
+        Method definition: use subprocess to call df -h output.
         """
         hd_space = subprocess.Popen('df -h',
                                  shell=True,
@@ -17,36 +17,59 @@ class HdChecker():
         return (stdout).decode('utf-8').strip('\n'), \
                (stderr).decode('utf-8').strip('\n')
 
+    def validate_output(self, output):
+        """
+        Method definition: use len of stdout and stderr to validate if output
+        succeded or failed.
+        """
+        if len(output[0]) > 0:
+            return True
+        else:
+            return False
+
     def parse_line(self, hd_space):
         """
-        Method definition:
+        Method definition: parse line 3 from the df -h output
         """
         hd_space_list = hd_space[0].split('\n')
         return hd_space_list[3]
 
     def get_percentage(self,line_three):
         """
-        Method definition:
+        Method definition: parse percentage from line 3 of output.
         """
         percentage = line_three.split()
         return percentage[4]
 
     def string_to_int(self, percentage):
+        """
+        Method definition: convert percentage string to int.
+        """
         percentage_int = percentage[0:2]
         return int(percentage_int)
 
     def validate_percentage(self, percentage):
-        high = 34
-        if high >= 0 and high <= 89:
-            print('You have used up {}% of your HD Space and are within 0% <> 89% limits'.format(high))
-        if high >= 90:
-            print("WARNING, you're running low on HD space. Currently at {}%".format(high))
+        """
+        Method definition: check percentage to see if it's above 90.
+        """
+        if percentage >= 0 and percentage <= 89:
+            print('You have used up {}% of your HD Space'\
+                  ' and are within 0% - 89% limits'.format(percentage))
+        if percentage >= 90:
+            print("WARNING, you're running low on HD space.'\
+                  ' Currently at {}%".format(percentage))
 
 
-
-hd_check = HdChecker()
-hd_space = hd_check.launch_hd_space()
-line_three = hd_check.parse_line(hd_space)
-hd_percentage = hd_check.get_percentage(line_three)
-percentage_int = hd_check.string_to_int(hd_percentage)
-valid_percentage = hd_check.validate_percentage(percentage_int)
+try:
+    hd_check = HdChecker()
+    hd_space = hd_check.launch_hd_space()
+    valid_output = hd_check.validate_output(hd_space)
+    if valid_output:
+        line_three = hd_check.parse_line(hd_space)
+        hd_percentage = hd_check.get_percentage(line_three)
+        percentage_int = hd_check.string_to_int(hd_percentage)
+        valid_percentage = hd_check.validate_percentage(percentage_int)
+    else:
+        print('ERROR:There was an issue runnning "df -h" on this system.')
+except (KeyboardInterrupt, SystemExit):
+        sys.exit(0)
