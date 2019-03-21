@@ -50,14 +50,12 @@ class HdChecker():
 
     def validate_percentage(self, percentage):
         """
-        Method definition: check percentage to see if it's above 90.
+        Method definition: return True if percentage is above 90%.
         """
-        if percentage >= 0 and percentage <= 89:
-            print('You have used up {}% of your HD Space'\
-                  ' and are within 0% - 89% limits'.format(percentage))
         if percentage >= 90:
-            print("WARNING, you're running low on HD space.'\
-                  ' Currently at {}%".format(percentage))
+            return True
+        else:
+            return False
 
 
 try:
@@ -69,6 +67,12 @@ try:
         hd_percentage = hd_check.get_percentage(line_three)
         percentage_int = hd_check.string_to_int(hd_percentage)
         valid_percentage = hd_check.validate_percentage(percentage_int)
+        if valid_percentage:
+            print("WARNING, you're running low on HD space. "
+                  "Currently at {}%".format(percentage_int))
+        else:
+            print('You currently have {}% HD space used.'
+                  .format(percentage_int))
     else:
         print('ERROR:There was an issue runnning "df -h" on this system.')
 except (KeyboardInterrupt, SystemExit):
